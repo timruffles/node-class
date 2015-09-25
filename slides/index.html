@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">  
+    <title>Node for RESTful and real-time APIs</title>
+    <link rel="stylesheet" href="reveal/css/reveal.css">
+    <!-- <link rel="stylesheet" href="reveal/css/print/pdf.css"> -->
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="reveal/css/reveal.min.css">
+    <link rel="stylesheet" href="reveal/lib/css/github.css">
+
+    <link rel="stylesheet" href="slides-theme/style.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<section data-markdown><script type="text/template">
+
+  ## Node for RESTful and real-time APIs
+
+  <img src=img/node-logo.svg alt='NodeJS with Tim Ruffles' width=800 height=219>
+
+  [@timruffles](http://truffles.me.uk)
+</script></section>
+
+<section data-markdown><script type="text/template">
+  <h3 style='text-transform:inherit' contenteditable>wifi: ??? / ???</h3>
+  <h3 contenteditable> clone/DL: github.com/timruffles/node-class</h3>
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+  ## Today
+
+  - ♬ Node... HUH! What is it good for? ♬
+  - Just enough Node
+  - One API to rule them all
+  - The asynchronous world
+  - HTTP
+  - REST
+  - Testing
+  - Real-time
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ## Why are you here?
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ![Entirely valid comparison](img/nodes-popularity.png)
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Node more popular than CARS shock!
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### *minor methodological issues
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### What's behind popularity?
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Pros of Node
+
+  - language: JS
+  - virtual-machine: V8 is faster than should be allowed
+  - approach to input-output: good performance under load
+  - module system
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Cons of Node
+
+  - language: JS
+
+  ```javascript
+  false == "\t\t\t\t \n   \n"; // true
+  ```
+
+  - no support for in-process parallelism (multiple CPUs)
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### What makes Node different to other platforms?
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Asynchronous IO
+  
+  - core design element of standard-library
+  - whole eco-system sticks to async
+  - vs Ruby EM, Python Twisted which are less broadly supported
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Let's compare
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Synchronous IO
+
+  - AKA 'blocking IO'
+
+  ```javascript
+  1 // we'll not continue to the next line until the OS
+  2 // has read the file and provided it back to our process
+  3 var contents = fs.readFileSync("/tmp/hello", "utf8");
+  4 
+  5 console.log("End of source file");
+  ```
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### Asynchronous IO
+
+  - AKA 'non-blocking IO'
+
+  ```javascript
+  1 fs.readFile("/tmp/hello", { encoding: "utf8" },
+  2  function(err, content) {
+  3    // (2/2) ...we get here
+  4    console.log("Read the file");
+  5  });
+  6
+  7 // (1/2) we'll get here waaaaaaaaaaaay before...
+  8 console.log("End of source file");
+  ```
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### Clearing the stack
+
+  - no code ever runs simultaneously
+  - while code is running, no callbacks fire
+  - don't block the loop
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Before we do asyc, we'll need to learn...
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ## Just Enough Node®
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Installing Node
+
+  - navigate to [nodejs.org](http://nodejs.org) using your browser of choice
+  - hit the green button, and run the installer
+  - open a terminal
+  - you got `npm` for free!
+</script></section>
+
+
+
+<section data-markdown><script type="text/template">
+  ### The `node` binary
+
+  - this is how we kick-off node processes
+  - `node some/source-file.js` will read and run `some/source-file.js`
+  - `CTRL c` to kill the process
+  - ask for `node --help` to see options
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Writing node
+
+  - open `exercises/hello/exercise.js`, and type:
+
+  ```javascript
+  console.log('I AM WRITING NODE!');
+  ```
+
+  - save it
+  - navigate to `exercises/hello`
+
+  ```sh
+  $ cd exercises/hello
+  $ node exercise.js
+  I AM WRITING NODE!
+  ```
+
+  - WOAH!!!
+</script></section>
+
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/hello`
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### The `node` REPL
+
+  - run node without a source-file to get a REPL
+  - read-eval-print-loop
+  - great for experimenting/debugging
+
+  ```javascript
+  $ node
+  > 0.1 + 0.2
+  0.30000000000000004
+  ```
+</script></section>
+<section data-state=title data-markdown><script type="text/template">
+  ## You can't Node without... modules
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ## Modularity
+
+  - modularity is a core part of the 'Node Way'
+  - it's easy
+  - `npm`: one of the best package managers around
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Modules!
+
+  - each source file is a module
+  - `module` variable in scope
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### exporting
+
+  - `module.exports` is where we export
+  - starts as `{}`, but we can reassign it
+  - exports multiple properties
+
+  ```javascript
+  exports.square = function(x) {
+    return x * x;
+  }
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### exports is an alias
+
+  ```javascript
+  module.exports = {};
+
+  // won't work! exports refers to original
+  exports.square = square;
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### reassigning
+
+  - exports a single function
+
+  ```javascript
+  module.exports = function(x) {
+    return x * x;
+  }
+  ```
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise intro
+
+  ```sh
+  exercise/modules
+    exercise.js # edit this
+    verify.js   # run 'node verify.js' to check answer
+  ```
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/exporting`
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ## You can't Node without... first-class functions
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Functions are powerful in JS
+
+  - first-class: can be used like any other value
+  - e.g passed into functions, stored in variables
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ```javascript
+  // store fns in variables
+  var adder = add;
+
+  // function declarations are hoisted to
+  // top of containing scope - useful for readability
+  function add(a,b) {
+    return a + b;
+  }
+  ```
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ```javascript
+  // declare anonymous functions,
+  // and pass functions to other functions
+  setTimeout(function() {
+    console.log("I was printed after the stack cleared");
+  });
+  ```
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ```javascript
+  // we're returning a function here, and storing it
+  var add5 = incrementFactory(5);
+
+  console.log(add5(10)); // 15
+
+  function incrementFactory(n) {
+    // return functions, using access to first function's
+    // locals
+    return function(m) {
+      return n + m;
+    }
+  }
+  ```
+
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ## You can't Node without... async!
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ```javascript
+  setTimeout(function() {
+    console.log("first in file");
+  }, 500);
+
+  console.log("second in file");
+
+  setTimeout(function near() {
+    console.log("third in file");
+  }, 250);
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Our first asynchronous function
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/functions`
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ## An auspicious moment...
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### You are ready to take take the next step...
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### ...on the road to Node englightenment
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### The one true callback API!
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Behold!
+
+  <code>
+  function cb(error, data) {
+  }
+  </code>
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Thou shalt check for errors
+
+  <code style="color: #888; white-space: pre">
+  function cb(<span style="color: red">error</span>, data) {
+  }
+  </code>
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### If errors lurk, thou shalt not use the data
+
+  <code style="color: #888; white-space: pre">
+  function cb(error, data) {
+    <span style="color: red">if(error) {
+      return;
+    }</span>
+  }
+  </code>
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### ...for it may explode
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### If error is falsy, we may use the data
+
+  <code style="color: #888; white-space: pre">
+  function cb(error, data) {
+    if(error) {
+      return;
+    }<span style="color: red"> else {
+      console.log("I read: '%s'", data);
+    }</span>
+  }
+  </code>
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Study the callback API
+
+  <code style="white-space: pre;">
+  <span style="color: #888">// cb(error [, arg1, arg2 ... argN] )</span>
+  function cb(error, data) { }
+  </code>
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### For it is used everywhere
+
+  ```javascript
+  fs.readFile(somePath, function(err, content) {
+    if(err) {
+      // file may not exist, or we don't have 
+      // permissions, or the disk has exploded or...
+      console.error("ooh err '%s', err);
+    } else {
+      // yay, all is good! we can use content
+      console.log("here's your content: '%s', content);
+    }
+  });
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/callback-api`
+</script></section>
+
+<!-- TODO add section on 
+
+- return/throws analogy for callbacks, e.g they are async return/throw
+- callback called max 1 time
+- important to keep async functions async (aside from programmer errors)
+- slide on ensuring every branch ends up with callbacks been called
+
+-->
+
+<section data-state=title data-markdown><script type="text/template">
+  ## The node standard-library
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Programming Node involves three sources of APIs
+
+  - Javascript & standard library - e.g `Date`, `Array`
+  - NodeJS standard library - e.g `fs`, `crypto`, `Buffer`
+  - Third-party JS, usually via `npm`
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### We load other JS code via `require`
+
+  - whether it's part of Node stdlib, or `npm` or our own code
+  - `npm` and Node stdlib are required by name alone
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Using `require()`
+  - our own code is required by path
+  - `require()` returns the module
+
+  ```javascript
+  // node stdlib file-system module
+  var fs = require('fs');
+
+  fs.unlink("/tmp/something", handleUnlink);
+
+  // our code (i.e source files) are required by path
+  var badgerSpotter = require("./badgers/spotter");
+
+  badgerSpotter.watch(garden);
+  ```
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### NodeJS stdlib
+
+  - [http://nodejs.org/api/](http://nodejs.org/api/)
+  - written in JS & C++, providing platform tools not offered by JS
+  - i.e non-blocking IO, crypto, buffers for binary data
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### `fs` - file system
+
+  - mix of sync and async 
+  - binary and non-binary data (i.e human-readable)
+  - binaries in `Buffer`s
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/fs`
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### We've come far
+
+  - write node and ran it via `node`
+  - learned about functions
+  - used `require()`
+  - appreciated the one true callback API
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### We're ready...
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ## Networking!
+
+  - without networking, what's the point?
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Node and networking
+
+  - `net` for sockets: low-level UDP & TCP
+  - `http` for web-programming
+  - higher level: `express`, `hapi`, `restify` etc
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### `express`
+
+  - a third-party HTTP server library
+  - inspired by Sinatra, Flask etc
+  - readable and productive
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Installing third-party code
+
+  - `npm`, the node package manager
+  - comes with node
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### `npm install`
+
+  - local install: per project, in local `node_modules` folder
+  - `npm install --global`: for CLI tools
+  - danger of global - multiple projects with different versions
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### `package.json`
+
+  - each module on `npm` has a `package.json`
+  - our projects will too
+  - tracking dependencies: A Good Thing
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Creating a `package.json`
+
+  - CLI tool to generate boiler-plate
+
+  ```sh
+  $ npm init
+  This utility will walk you through creating a package.json file.
+  ...
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Recording dependencies
+
+  - `npm install --save concat`
+  - will install module and save it to "package.json"
+  - will record version: vital for reproducibility
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/package`
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Using express
+
+  - `express()` will create a new server
+  - we create routes it'll respond to
+
+  ```javascript
+  var express = require("express");
+  var server = express();
+
+  server.get("/hello", function(req, res) {
+    res.send("<h1>Hi there</h1>");
+  });
+  ```
+
+</script></section>
+
+<section data-markdown class=big-code><script type="text/template">
+  ### Routing
+
+  - `server.{verb}({path}, handlerFunction)`
+  - verbs: `get`, `post`, `delete`, `put` etc
+
+  ```javascript
+  server.get("/players", handler)
+  ```
+
+</script></section>
+
+<section data-markdown class=big-code><script type="text/template">
+  ### Routes
+
+  - `:paramName` will match and extract a chunk from the URL
+  - `:paramName?` for an optional param
+  - `:paramName*` for matching anything including slashes
+  - supports regexs too for total control
+
+  ```javascript
+  server.get("/races/:id/runner/:position")
+  ```
+
+</script></section>
+
+<section data-markdown class=big-code><script type="text/template">
+  ### Request & response
+
+  - `req` has methods/properties relating to the request
+  - `res` gives us methods to reply
+
+  ```javascript
+  server.get("/hello", function(req, res) {
+    res.send("<h1>Hi there<h1>");
+  });
+  ```
+
+</script></section>
+
+
+
+<section data-markdown class=big-code><script type="text/template">
+  ### Request 
+  - e.g `req.params.username`
+
+  ```javascript
+  server.get("/users/:username",
+    function(req, res) {
+      res.send("Hi " + req.params.username);
+    });
+  ```
+
+</script></section>
+
+<section data-markdown class=big-code><script type="text/template">
+  ### Response 
+  - e.g `res.send()`
+
+  ```javascript
+  server.get("/users/:id",
+    function(req, res) {
+      if("id" in req.params) {
+        res.status(400).end();
+      } else {
+        // retrieve user JSON
+        // ...
+        res.send(userJson);
+      }
+    });
+  ```
+
+</script></section>
+
+<section data-markdown class=big-code><script type="text/template">
+  ### `res.send()`
+
+  - `send()` an object to convert to JSON
+  - or a string for pre-serialized
+
+  ```javascript
+  server.get("/hello", function(req, res) {
+    res.send({ hi: "there" });
+  });
+  ```
+
+</script></section>
+
+<section data-markdown class=big-code><script type="text/template">
+  ### `res.status()`
+
+  - be a good HTTP author: use statuses
+  - lets clients realise something is wrong
+  - keep response type consistent
+
+  ```javascript
+  server.get("/hello", function(req, res) {
+    res.status(404).send({ 
+      error: "no idea what you want",
+    });
+  });
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Game server
+
+  - big goal:
+  - allow joining
+  - allow playing
+
+</script></section>
+
+
+<section data-markdown data-state=title><script type="text/template">
+  ### REST!
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### RESTful
+
+  - using HTTP as an application protocol
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Why?
+
+  - convention
+  - caching
+  - tooling
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Also...
+
+  - HTTP has everything we need for an application protocol!
+  - why roll your own?
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### e.g
+
+  - 'function calls' - indicating action and parameters
+  - error handling
+  - 'type system' - meta-data to indicate requirments
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### Verbs
+
+  - HTTP has a nice set of verbs
+  - GET + HEAD ask for things
+  - POST, DELETE, PUT and friends change things
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Statuses
+
+  - HTTP has rich status codes
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### 2xx = yay
+
+  - responses with content
+
+  ![200-status-code-image](img/200.jpg)
+
+  [1] thanks to HTTP status cats - see final slide
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### 3xx = over there
+
+  - redirection
+  - or: you already have that (cached)
+  ![300-status-code-image](img/300.jpg)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### 4xx = user's fault
+
+  - client error
+  - e.g missing parameter
+  ![400-status-code-image](img/400.jpg)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### 5xx = our fault
+
+  - server error
+  - e.g programmer error
+  ![500-status-code-image](img/500.jpg)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### URIs
+
+  - HTTP has nice ways to pass parameters
+  - paths: logical structure to resources
+  - query strings: sub-set a resource
+  - headers: metadata
+
+  ```sh
+  your-app.com/posts/12-some-title/comments.json?summary=true
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Resource structure
+
+  ```javascript
+  GET /users/150
+
+  GET /users/150.json 
+
+  GET /users/150?format=json&summary=true
+
+  GET /users?page=3
+
+  GET /users/new
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Which to use?
+
+  - paths: resource ownership
+  - query strings: configuring response
+  - headers: auth etc
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Semantic actions
+
+  ```sh
+  // create a user
+  POST /users
+
+  // make a comment on a specific article
+  POST /post/179/comments
+
+  // create a blog-post for current user
+  POST /me/posts
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### JSON APIs
+
+  - request + response are JSON
+  - set headers: `Content-Type: application/json`
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Most important
+
+  1. GET asking, POST etc changing
+  1. use status codes for errors
+  1. keep format consistent
+  1. all plurals, or all singular
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Tools
+
+  - swagger: generates clients and documentation UI
+  - benefit of convention
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Version your APIs
+
+  - (for real apps)
+  - just do it, thank me later
+
+  ```sh
+  /api/v1/users
+  ```
+
+</script></section>
+
+<section data-markdown data-state=title><script type="text/template">
+  ### Designing an API
+
+</script></section>
+
+
+
+<section data-markdown><script type="text/template">
+  ### Joining
+
+  - `POST /players`
+  - will reply with player and initial state
+
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ### Testing!
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### We wouldn't want to test that by hand
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Let's automate
+
+  - (we're programmers after all)
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Dramatis personæ
+
+  - framework
+  - assertions
+  - HTTP testing
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Dramatis personæ
+
+  - framework: mocha
+  - assertions: chai
+  - HTTP testing: supertest
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Getting those libs
+
+  - `npm i` saves you 55% of the work
+  - `--save-dev`: won't install in production
+
+  ```sh
+  npm i --save-dev mocha chai supertest
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### mocha
+
+  - testing goodness
+  - we'll use `describe` and `it` syntax
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### Using mocha
+
+  ```javascript
+  // describe what's under test
+  describe("game server", function() {
+
+    beforeEach(function() {
+      // run before each 'it()' test case
+    })
+
+    // describe the behaviour we want from our model
+    it("exposes endpoint with current state", function(done) {
+      // this is our test case
+      // done is a node-callback, if it gets an error the test fails
+    })
+
+  });
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### chai
+
+  - an assertion library
+  - assertions are simple: `assert.equal(actual, expected [, message])`
+  - ideally: one assertion per `it()`
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Exercise info
+
+  - will run two sets of tests
+  - when your test & baseline passes, you've test-driven successfully!
+
+  ```sh
+   ===   YOUR TESTS  ===
+   ===   BASELINE TESTS  ===
+  ```
+
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/tdd`
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Back to joining
+
+  - `POST /players`
+  - will reply with player and initial state
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Testing HTTP
+
+  - node great at this
+  - we'll listen & connect in same process
+
+</script></section
+
+<section data-markdown><script type="text/template">
+  ### `supertest`
+
+  - interacts with HTTP servers
+  - same API as the `superagent` HTTP client
+  - pass a connect-compatible server (`express`, `restify` etc)
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### using `supertest`
+
+  ```javascript
+  supertest(server)
+    // what should we request
+    .get("/game")
+    // what should the response look like?  
+    .expect(200)
+    .expect(function(res) {
+      assert.equal(res.players.length, 0);
+    })
+    // send the request, and inform mocha when it's done
+    .end(done);
+
+  ```
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### All together
+
+  ```javascript
+  var supertest = require("supertest");
+
+  describe("game server", function() {
+
+    beforeEach(function() {
+      request = supertest(require("../src/server"));
+    });
+
+    it("lets me join the game", function(done) {
+      request
+        .post("/players")
+        .send({ name: "sarah" })
+        .expect(200)
+        .expect(function(res) {
+          assert.equal(res.players.length, 0);
+        })
+        .end(done);
+    });
+  });
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### OK let's drive!
+
+  - we want to call `game.join(playerData, callback)`
+  - in callback send back the data
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/tdd-http`
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ## Command API
+
+  - player moving
+
+</script></section>
+
+<section  data-markdown><script type="text/template">
+  ### Endpoints
+
+  - `POST /commands` - input commands
+
+</script></section>
+
+<section  data-markdown><script type="text/template">
+  ### With commands affecting state...
+</script></section>
+
+<section  data-markdown><script type="text/template">
+  ### ...we need to know who you are
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Authentication
+
+  - we need to authenticate/identify future requests
+  - we'll use cookies
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Cookie
+
+  - HTTP = stateless
+  - so how do I identify you between requests?
+  - give you a cookie to hold, & send each time
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Sessions & REST
+
+  - REST: client state on client
+  - so cookies + sessions only for implementing auth
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Why client state on client?
+
+  - caching (done for you, at every layer)
+  - load-balancing
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### `express-session`
+
+  - install
+  - standard pattern of plugin/middleware
+  
+  ```javascript
+  app.use(require("express-session")({
+    secret: process.env.SECRET || "not safe",
+    resave: true,
+    saveUninitialized: true,
+  }));
+  ```
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### `process.env`
+
+  - env variables
+  - good way to configure apps
+  
+  ```javascript
+  app.use(require("express-session")({
+    secret: process.env.SECRET || "not safe",
+  }));
+  ```
+
+  ```sh
+  // *nix
+  SECRET=aef32se node server.js
+
+  // windows
+  SET SECRET=aef32se
+  node server.js
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Using `req.session`
+
+  - key-value store
+  - access/assign via `req.session`
+  
+  ```javascript
+  req.session.playerId = player.id;
+
+  // later request
+  game.getPlayer(req.session.playerId, handle);
+  ```
+
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/sessions`
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Commands
+
+  - we need to decide the player to affect
+  - need authentication middleware
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Middleware
+
+  - big part of writing express apps
+  - middleware chain up
+
+  ```javascript
+  app.use(require("body-parser").json());
+  app.use(authenticate);
+  app.use(acl);
+  // routing...
+  app.use(errorHandler);
+  ```
+</script></section>
+
+<section class="big-code" data-markdown><script type="text/template">
+  ### Writing middleware
+
+  - `next()` to delegate to next in chain
+  - `next(err)` to pass on an error
+
+  <code>
+function(req, res, <span class=hl>next</span>) { }
+  </code>
+</script></section>
+
+<section class="big-code" data-markdown><script type="text/template">
+  ### Chaining
+
+  - if you know what caused an error, end chain
+  - if not, use `next(err)` - perhaps someone else knowns
+  - like errors
+
+  <code>
+function(req, res, <span class=hl>next</span>) { }
+  </code>
+</script></section>
+
+<section class="big-code" data-markdown><script type="text/template">
+  ### Error-handling
+
+  - have a four-element middleware to catch errors
+
+  <code>
+function(<span class=hl>err</span>, req, res, next) { }
+  </code>
+</script></section>
+
+<section class="big-code" data-markdown><script type="text/template">
+  ### In handlers
+
+  - use `req, res, next` and don't respond to errors directly
+  - keep all error response logic in your middleware
+
+  ```javascript
+  var errors = require("../errors");
+
+  req.get("/user/:id", function(res, req, next) {
+    if(!req.params.id) {
+      return next(new errors.MissingParam("id"));
+    }
+  });
+  ```
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/middleware`
+
+</script></section>
+
+
+<section data-state=title data-markdown><script type="text/template">
+  ## Let's get REAL-TIME!
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Real-time
+
+  - hacks: poll, long-poll
+  - techs: server-sent events, web-sockets
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Polling
+
+  - just requesting in loop
+  - usually good enough
+  - very cacheable
+
+  ```javascript
+  // will be read 1,000,000s of times by pollers
+  redis.put("/latest-scores", scores)
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Server-sent events
+
+  - benefits: auto-reconnect with resume
+  - great browser API
+  - simple server API
+  - human-readable
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Web-sockets
+
+  - binary: efficient
+  - bi-directional
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Which fits our game?
+
+  - outgoing: 5 requests per second
+  - incoming: max players: 8, so 40 per second in
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Load
+
+  - outgoing: 5/sec low
+  - incoming: 40/sec medium
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### Implementation
+
+  - outgoing: HTTP
+  - incoming: server-sent events
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Server-sent events
+
+  - good enough performance
+  - extremely simple API
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Server-side API
+
+  - start off with headers
+  - then a new-line delimated API
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Server-side session
+
+  ```
+  HTTP/1.1 200 OK
+  Content-Type: text/event-stream
+  Cache-Control: no-cache
+  Connection: keep-alive
+  Transfer-Encoding: chunked
+
+  event: gameEvent
+  data: {"player":{"id":"player3","x":1,"y":0,"name":"tim"},"target":{"x":1,"y":0},"id":3,"name":"move"}
+
+  event: ...
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Client-side
+
+  - not implementing today
+  - auto-reconnect!
+
+  ```javascript
+  var events = new EventSource("/events");
+  events.addEventListener("gameEvent", handler);
+  ```
+
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/server-sent-events`
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### That looks useful
+
+  - your SSE implementation could be used elsewhere
+  - let's share it via `npm` to allow everyone to use it!
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### Publishing to NPM
+
+  - easy to publish a module
+  - all you need is a `package.json`
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### `npm publish`
+
+  ```sh
+   // follow
+  npm adduser
+
+  // from your folder
+  npm publish 
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Use!
+
+  ```sh
+  npm install -S your-project-name
+  ```
+
+  ```javascript
+  var myModule = require("your-project-name");
+  // profit!
+  ```
+
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ## Events
+
+  - what are we going to send?
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### `EventEmitter`
+
+  - core node library
+  - good way of structuring apps
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### API
+
+  - like browser, only shorter
+  - `addListener` vs `addEventListener`
+
+  ```javascript
+  game.addListener("gameEvent", handle);
+
+  // ...inside game
+  this.emit("gameEvent", { name: "moved" /*...*/ });
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Using `events`
+
+  - `EventEmitter` lives in `events`
+  - we need to inherit
+  - `utils.inherits` is our friend
+
+  ```javascript
+  var EventEmitter = require("node-event-emitter").EventEmitter;
+
+  function Game() {
+    // call parent constructor
+    EventEmitter.call(this);
+  }
+
+  // setup prototype
+  util.inherits(Game, EventEmitter);
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Production use
+
+  - link up our game's events to browser
+
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/event-emitter`
+
+</script></section>
+
+
+<section data-state=title data-markdown><script type="text/template">
+  ### Stacks
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### What foundation for your app?
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Many options
+
+  - decide based on app's requirements
+  - not acronyms :)
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### MEAN
+
+  - Mongo
+  - Express
+  - Angular
+  - Node
+</script></section>
+
+<section data-markdown data-state=title><script type="text/template">
+  ### A = Angular
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Angular
+
+  - single-page app framework
+  - two-way data-binding
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### SPA structure
+
+  - client now holds all templating
+  - server is now a JSON API only
+  - client holds more state
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### SPA nuts'n'bolts
+
+  - loads `index.html` for each request
+  - client determines page from URL
+  - client requests data from server via AJAX
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### SPA pros/cons
+
+  - slower first page load (i.e bad for static content sites)
+  - fast internal page loads
+  - potential for more app-y feel
+  - harder to test throughly
+  - more stateful
+</script></section>
+
+<section data-markdown data-state=title><script type="text/template">
+  ### M = Mongo
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Mongo
+
+  - Document store
+  - JSON semantics
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Document?
+
+  - unstructured
+  - like JS objects, key/value pairs
+  - grouped into collections
+  - can still index
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Advantages of documents
+
+  - locality
+
+  ```javascript
+  {
+    title: "Why documents are interesting",
+    body: "We get all the data we need in a single document...",
+    comments: [
+      {
+        body: "So you have to nest all the data?",
+        email: "bob@bob.com",
+      },
+      {
+        body: "Why not just use flat files?",
+        email: "sceptic@xyz.com",
+      },
+      {
+        body: "invest in my bridge scheme! google.com.malware.tk",
+        email: "dodgy@hotmail.com",
+      }
+    ],
+    author: {
+      name: "amy samey",
+      // more
+    },
+  }
+  ```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### NEAP
+
+  - Postgres (or MySQL etc)
+  - Express
+  - Angular
+  - Node
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### NEAP nicities
+
+  - schema: no bad data
+  - multi-entity transactions 
+  - joins
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Problems with documents
+
+  - denormalising (aggregating data) makes updates painful
+  - schemas still there, just implicit now
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### NEAP vs MEAN
+
+  - higher value your data, better NEAP is
+  - if you (already) have write scaling issues & low-value data, MEAN
+  - most apps in my experiences are better going NEAP
+  - especially as PG supports JSON quertying now
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### A heartfelt plea
+
+  - choose your stack around your application's needs
+</script></section>
+
+
+<section data-markdown data-title><script type="text/template">
+  ### Using mongo
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Install
+
+  - https://www.mongodb.org/downloads
+  - http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Install driver
+
+  - platform specific, needs to install
+
+  ```sh
+  npm i mongodb
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Run DB
+
+  - as it's schemaless, we have no more steps!
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+  ### Connecting
+
+  ```javascript
+  var url = 'mongodb://localhost:27017/demo';
+  mongodb.MongoClient.connect(url, function(err, _db) {
+    if(err) {
+      cb(err);
+    } else {
+      db = _db;
+      cb(null, db);
+    }
+  });
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Inserting
+
+  ```javascript
+  db.collection("players")
+  .insertOne({
+    name: "sarah",
+  }, function(err, result) {
+    if(err) {
+      return cb(err);
+    }
+    
+    if(result.insertedCount !== 1) {
+      return cb(new Error("not-inserted"));
+    }
+
+    // default drive has quite arcane result structure
+    cb(null, result.ops[0]);
+  })  
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Querying
+
+  ```javascript
+  var ObjectID = require('mongodb').ObjectID; 
+
+  var players  = db.collection("players")
+
+  players.findOne({
+    _id: ObjectID(id),  
+  }, findOneCb);
+
+  players.find({
+    age: 24,
+    country: "uk",
+  }, findOneCb);
+  ```
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Updating
+
+  ```javascript
+  var ObjectID = require('mongodb').ObjectID; 
+
+  var players  = db.collection("players")
+
+  players.update({
+    _id: ObjectID(id),
+  }, {
+    // make sure to use mongo's atomic operations
+    // to modify nested data-structures
+    $push: {
+      interests: "mongodb",
+    },
+  }, updateCb);
+
+  ```
+</script></section>
+
+<section data-state=exercise data-markdown><script type="text/template">
+  ### Exercise
+
+  #### `exercises/mean`
+
+</script></section>
+
+<section data-markdown data-state=title><script type="text/template">
+  ### Blimey!
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Busy day
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### The 'node way'
+
+  - programs composed of small modules
+  - consistent APIs, especially the one-true-callback pattern
+</script></section>
+
+<section data-state=title data-markdown><script type="text/template">
+  ### Where next?
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### HTTP
+
+  - `hapi` - bigger API server
+  - `restify` - DTrace for monitoring power
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Streams
+
+  - low memory use processing
+  - ideal for binary data
+  - functional transforms
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Managing async
+
+  - Promises! In the browser, in node
+  - bluebird, Q
+  - `async` - library for callbacks
+  - ES6 - Generators
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ### Events
+
+  - LNUG - last Wednesday of the month
+  - London NodeSchool - often!
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ## Thanks!
+
+  - @timruffles
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+  ## Attribution & thanks
+
+  - awesome cat status codes from [girliemac](http://www.girliemac.com/blog/)
+
+  - @timruffles
+
+</script></section>
+
+
+
+
+
+
+<script src="reveal/lib/js/head.min.js"></script>
+<script src="reveal/js/reveal.min.js"></script>
+<script>
+
+  Reveal.initialize({
+
+    // Display controls in the bottom right corner
+    controls: false,
+
+    // Display a presentation progress bar
+    progress: false,
+
+    // Push each slide change to the browser history
+    history: true,
+
+    // Enable keyboard shortcuts for navigation
+    keyboard: true,
+
+    // Enable the slide overview mode
+    overview: true,
+
+    // Vertical centering of slides
+    center: false,
+
+    // Loop the presentation
+    loop: false,
+
+    // Change the presentation direction to be RTL
+    rtl: false,
+
+    // Number of milliseconds between automatically proceeding to the
+    // next slide, disabled when set to 0, this value can be overwritten
+    // by using a data-autoslide attribute on your slides
+    autoSlide: 0,
+
+    // Enable slide navigation via mouse wheel
+    mouseWheel: false,
+
+    // Apply a 3D roll to links on hover
+    rollingLinks: false,
+
+    // Transition style
+    transition: 'linear', // default/cube/page/concave/zoom/linear/fade/none
+
+    dependencies: [
+        // Cross-browser shim that fully implements classList - https://github.com/eligrey/classList.js/
+        { src: 'reveal/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+
+        // Interreveal/pret Markdown in <section> elements
+        { src: 'reveal/plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'reveal/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+
+        // Syntareveal/x highlight for <code> elements
+        { src: 'reveal/plugin/highlight/highlight.js', async: true, callback: function() {
+              hljs.initHighlightingOnLoad();
+          }},
+
+        // Zoom reveal/in and out with Alt+click
+        { src: 'reveal/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+
+        // Speakreveal/er notes
+        { src: 'reveal/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+
+    ]
+
+  });
+
+</script>
+</body>
+</html>
+
+
+<!-- copyright Tim Ruffles -->

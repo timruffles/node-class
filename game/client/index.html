@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Angular Simple Skeleton</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body ng-app=game>
+
+    <div ng-controller="AppCtrl as app">
+
+      <div class=row ng-controller="GameCtrl as gameCtrl">
+        <keyboard-handler
+          keys='{
+            87: "gameCtrl.move(\"up\")",
+            38: "gameCtrl.move(\"up\")",
+
+            68: "gameCtrl.move(\"right\")",
+            39: "gameCtrl.move(\"right\")",
+
+            83: "gameCtrl.move(\"down\")",
+            40: "gameCtrl.move(\"down\")",
+
+            65: "gameCtrl.move(\"left\")",
+            37: "gameCtrl.move(\"left\")"
+
+          }'>
+        </keyboard-handler>
+
+
+        <div class="arena" ng-if="game.ready">
+
+          <div class="game-row" ng-repeat="x in rows()">
+
+            <div class="tile" ng-repeat="y in columns()" ng-style="position(x,y)">
+
+              <img width=101 src="img/Grass Block.png" >
+              <img width=101 height=171 ng-if="occupant(x,y)" ng-src="{{ occupant(x,y) | characterImage }}"  class="occupant" >
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+      </div>
+
+      <div class=scores >
+
+        <ol>
+          <li ng-repeat="player in world.players.members | orderBy:'-score'">
+            {{ player.id }} - {{ player.score }}
+          </li>
+        </ol>
+
+      </div>
+
+    </div>
+
+    <script src="vendor/lodash.js"></script>
+    <script src="vendor/angular.js"></script>
+    <script src="dist/app.js"></script>
+</body>

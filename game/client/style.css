@@ -1,0 +1,28 @@
+body {
+  font-family: sans-serif;
+}
+
+.arena {
+  width: 800px;
+  height: 1000px;
+  float: left;
+}
+
+.arena .tile {
+  position: absolute;
+}
+
+.arena img {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.arena .occupant {
+  top: -35px;
+}
+
+.scores {
+  width: 200px;
+  float: left;
+}

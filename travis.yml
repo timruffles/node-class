@@ -1,0 +1,2 @@
+install: true # everything is inlined for easy install
+script: npm test

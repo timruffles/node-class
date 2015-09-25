@@ -13,11 +13,14 @@ var game = require("./game");
 
 // TODO validate 'name' is present in body
 
-// TODO accept posts to /players
+// TODO accept posts to /players 
+//
+// TODO validate the name is present, giving an error if not
+//
+// TODO join game with submitted data via `game.join(playerData, cb)`
 
-// TODO pass an object with following keys/values
+// TODO pass game.join an object with following keys/values
 // - name: name sent in post body
-// validate the name is present
 
 // TODO handle errors from game.join
 

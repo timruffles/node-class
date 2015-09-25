@@ -1,10 +1,17 @@
+/**
+ * we're working with the 'mongodb' driver
+ *
+ * documentation is at
+ *
+ *   http://mongodb.github.io/node-mongodb-native/2.0
+ *
+ */
 'use strict';
 var mongodb = require("mongodb");
 var ObjectID = require('mongodb').ObjectID; 
 
 // this is where we'll cache our db connection
 var db;
-
 
 
 exports.join = function(data, cb) {
@@ -49,7 +56,8 @@ exports.chat = function(id, chatData, cb) {
 
 
 /*
- * this method retrieves the current db connection
+ * this method retrieves the current db connection - you don't need to 
+ * modify it
  */
 function getDb(cb) {
   if(db) {

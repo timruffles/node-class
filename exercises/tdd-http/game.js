@@ -1,3 +1,9 @@
+/**
+ * here is the stub implementation of a backend.
+ *
+ * you don't need to modify this - but it can be helpful
+ * to read to verify how to use the .join method
+ */
 var players = [];
 var playerId = 0;
 

@@ -9,7 +9,8 @@ describe("package.json", function() {
 
   help.importAndTest(__dirname, function(exported) {
 
-    it("package.json isn't a valid json file", function() {
+
+    it("is a valid json file", function() {
       assert(pkg, "invalid json");
     });
 
@@ -20,6 +21,7 @@ describe("package.json", function() {
     it("has express as a dependency", function() {
       assert.property(pkg.dependencies, "express");
     });
+        
 
   });
 

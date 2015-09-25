@@ -1787,7 +1787,7 @@ function(<span class=hl>err</span>, req, res, next) { }
       return cb(new Error("not-inserted"));
     }
 
-    // default drive has quite arcane result structure
+    // default driver has quite arcane result structure
     cb(null, result.ops[0]);
   })  
   ```

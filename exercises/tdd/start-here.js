@@ -12,11 +12,6 @@ var outOfBounds = require("./exercise").outOfBounds;
 
 describe("the outOfBounds function", function() {
 
-  // these tests look repetitive, perhaps you could
-  // think of a way of cleaning it up?
-  // - keep readability of tests
-  // - keep it so one test can fail alone
-
   it("prevents players leaving the top", function() {
     // TODO stop players reaching { y: < 0 }
   });
@@ -36,6 +31,13 @@ describe("the outOfBounds function", function() {
   it("allows spaces within bounds", function() {
     // TODO allow players to reach spots within bounds
   });
+
+  // TODO bonus
+  //
+  // these tests look repetitive, perhaps you could
+  // think of a way of cleaning it up?
+  // - keep readability of tests
+  // - keep it so one test can fail alone
 
 });
 

@@ -707,7 +707,7 @@
   ```javascript
   server.get("/users/:id",
     function(req, res) {
-      if("id" in req.params) {
+      if(!req.params.id) {
         res.status(400).end();
       } else {
         // retrieve user JSON
@@ -751,9 +751,8 @@
 </script></section>
 
 <section data-markdown><script type="text/template">
-  ### Game server
+  ### Designing a game server
 
-  - big goal:
   - allow joining
   - allow playing
 

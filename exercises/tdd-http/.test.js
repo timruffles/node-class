@@ -4,6 +4,8 @@ var game = require("./game");
 
 describe("your server", function() {
 
+  this.timeout(500);
+
   help.importAndTest(__dirname, function(exported) {
 
     beforeEach(game.reset);

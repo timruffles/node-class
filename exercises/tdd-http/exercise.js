@@ -4,25 +4,52 @@ var express = require("express");
 var game = require("./game");
 
 
-// TODO create server
+var app = express();
 
-// TODO export so we can test it
+// export so we can test it
+module.exports = exports = app;
 
-// TODO need to parse bodies
+// need to parse bodies
+app.use(require("body-parser").json());
 
 
-// TODO validate 'name' is present in body
+// accept posts to /players 
+app.post("/players", function(req, res) {
+  if(req.body.name) {
+    // join game with submitted data via `game.join(playerData, cb)`
+    // pass game.join an object with following keys/values
+    // - name: name sent in post body
+    game.join({
+      name: req.body.name,
+    }, function(err, player) {
+      // handle errors from game.join
+      if(err) {
+        res.status(500).send({
+          error: err,
+        });
+      } else {
+        res.send(player);
+      }
+    });
 
-// TODO accept posts to /players 
+  } else {
+    // validate the name is present, giving an error if not
 //
-// TODO validate the name is present, giving an error if not
-//
-// TODO join game with submitted data via `game.join(playerData, cb)`
+    return res.status(400).send({
+      error: "missing-name",
+    });
+  }
+});
 
-// TODO pass game.join an object with following keys/values
-// - name: name sent in post body
 
-// TODO handle errors from game.join
 
+if(require.main === module) {
+  var PORT = process.env.PORT || 3000;
+
+  app.listen(PORT, function() {
+    console.log("listening on %s", PORT);
+  })
+
+}
 
 

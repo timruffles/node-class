@@ -21,9 +21,18 @@ exports.join = function(data, cb) {
       return cb(err);
     }
 
-    // TODO insert our player into the db, and pass the inserted player to cb
-    // player should look like { name: name }
     db.collection('players')
+    .insertOne(data, function(err, result) {
+      if(err) {
+        return cb(err);
+      }
+
+      if(result.insertedCount === 1) {
+        cb(null, result.ops[0]);
+      } else {
+        cb(new Error("not-inserted"));
+      }
+    });
   });
 }
 
@@ -33,9 +42,10 @@ exports.getPlayer = function(id, cb) {
       return cb(err);
     }
 
-    // TODO find our player from the DB
-    // TODO remember to use ObjectID on the id - you won't find the document otherwise (as its id is not a string)
     db.collection('players')
+    .findOne({
+      _id: ObjectID(id),
+    }, cb);
   });
 }
 
@@ -50,6 +60,19 @@ exports.chat = function(id, chatData, cb) {
     // TODO make sure you use a method that *modifies* the array, not overwrites it
     // player will look like { chats: [ { text: "some text" }, ... ] }
     db.collection('players')
+    .update({
+      _id: ObjectID(id),
+    }, {
+      $push: {
+        chats: chatData,
+      },
+    }, function(err) {
+      if(err) {
+        cb(err);
+      } else {
+        cb(null, chatData);
+      }
+    });
   })
 }
 

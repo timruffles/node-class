@@ -4,9 +4,13 @@
 //
 // function cb(err, squaredNumber)
 exports.safeSquare = function(n, cb) {
-  // TODO validate n
-  // TODO pass on error
-  // TODO pass on result
+  if(isNaN(n)) {
+    // validate n
+    // pass on error
+    cb(new Error("n must be a number"));
+  } else {
+    cb(null, n * n);
+  }
 }
 
 
@@ -17,8 +21,9 @@ exports.safeSquare = function(n, cb) {
 exports.timeExecution = function(runMe, cb) {
   var start = +new Date;
 
+
   runMe(function(err, value) {
     var time = new Date - start;
-    // TODO pass on result
+    cb(err, value, time);
   });
 }

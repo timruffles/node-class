@@ -6,14 +6,15 @@ var outOfBounds = require("./exercise").outOfBounds;
 // outOfBounds(x, y, width, height)
 //
 // returns true if 
-//   0 <= x < width
+//   0 > x || x > width
 //         AND
-//   0 <= y < height
+//   0 > y || y > height
 
 describe("the outOfBounds function", function() {
 
   it("prevents players leaving the top", function() {
     // TODO stop players reaching { y: < 0 }
+    assert.isOutOfBounds(0, -100, 50, 50);
   });
 
   it("prevents players leaving the left", function() {
@@ -30,6 +31,8 @@ describe("the outOfBounds function", function() {
 
   it("allows spaces within bounds", function() {
     // TODO allow players to reach spots within bounds
+    var result = outOfBounds(25, 25, 50, 50);
+    assert.equal(result, false);
   });
 
   // TODO bonus

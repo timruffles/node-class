@@ -1,10 +1,10 @@
 var help = require("../.sys/test-help");
 var fs = require("fs");
+var pkg = require("./package.json");
 
 describe("package.json", function() {
 
   before(function() {
-    pkg = require(process.env.SPECIMIN ? "./.specimin.json" : "./package.json");
   });
 
   help.importAndTest(__dirname, function(exported) {

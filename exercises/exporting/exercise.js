@@ -1,15 +1,8 @@
-module.exports = exports = function() {
-  
-}
 
-// export the square method
-exports.square = square;
+// TODO export the square method
 
 
-// define and export an `add(a, b) :: c` method
-exports.add = function(a,b ) {
-  return a+b; 
-}
+// TODO define and export an `add(a, b) :: c` method
 
 
 

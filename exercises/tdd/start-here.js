@@ -6,10 +6,9 @@ var inBounds = require("./exercise").inBounds;
 // inBounds(x, y, width, height)
 //
 // returns true if 
-//
-//   0 <= x <= width
+//   0 <= x < width
 //         AND
-//   0 <= y <= height
+//   0 <= y < height
 
 describe("the inBounds function", function() {
 
